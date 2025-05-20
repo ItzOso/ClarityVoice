@@ -11,6 +11,8 @@ function NoteViewer() {
   const { currentNote, setCurrentNote } = useNoteViewer();
   const [isSaving, setIsSaving] = useState(false);
 
+  const [isShowingCurrent, setIsShowingCurrent] = useState(true);
+
   const [deleteModal, setDeleteModal] = useState(false);
 
   const deleteModalRef = useRef(null); // Ref for the dropdown menu
@@ -21,6 +23,8 @@ function NoteViewer() {
   const [originalContent, setOriginalContent] = useState("");
   // State to track if the note has been modified
   const [isDirty, setIsDirty] = useState(false);
+
+  const [showCopySuccess, setShowCopySuccess] = useState(false);
 
   useEffect(() => {
     const title = currentNote.title || ""; // Default to empty string if undefined
@@ -140,12 +144,31 @@ function NoteViewer() {
           />
         </div>
         <div>
+          <button
+            onClick={() => setIsShowingCurrent(true)}
+            className={`${
+              isShowingCurrent ? "btn-primary" : "btn-secondary"
+            } mr-2`}
+          >
+            Current
+          </button>
+          <button
+            onClick={() => setIsShowingCurrent(false)}
+            className={`${isShowingCurrent ? "btn-secondary" : "btn-primary"}`}
+          >
+            Original
+          </button>
+        </div>
+        <div>
           <textarea
             name=""
             id=""
-            value={currentNote?.content}
+            value={
+              isShowingCurrent ? currentNote?.content : currentNote?.original
+            }
             onChange={handleContentChange}
-            className="resize-none w-full input h-[320px]"
+            disabled={!isShowingCurrent}
+            className={`resize-none w-full input h-[320px] !px-4 !py-3 disabled:bg-gray-100`}
           ></textarea>
         </div>
         <div className="flex justify-between items-center mb-0">

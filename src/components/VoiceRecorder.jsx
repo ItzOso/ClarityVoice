@@ -12,6 +12,7 @@ import {
 function VoiceRecorder() {
   const [recording, setRecording] = useState(false);
   const [transcribing, setTranscribing] = useState(false);
+  const [polishing, setPolishing] = useState(false);
   const mediaRecorder = useRef(null);
   const chunks = useRef([]);
   const [audioUrl, setAudioUrl] = useState("");
@@ -95,6 +96,7 @@ function VoiceRecorder() {
               createNote(response.data.text);
             } catch (error) {
               console.error("Error sending audio to backend:", error);
+              setTranscribing(false);
             }
           };
           reader.readAsDataURL(audioBlob);
@@ -147,22 +149,36 @@ function VoiceRecorder() {
     };
   }, []);
 
-  const createNote = async (content) => {
+  const createNote = async (originalContent) => {
+    setPolishing(true);
     try {
+      const polishTranscription = httpsCallable(
+        functions,
+        "polishTranscription"
+      );
+
+      // returns json with title, content
+      const response = await polishTranscription({
+        transcription: originalContent,
+      });
+
+      const noteData = response.data;
+
       const notesRef = collection(db, "notes");
       const data = {
         uid: currentUser.uid,
-        title: "Untitled Note",
-        content,
-        original: content,
+        title: noteData.title,
+        content: noteData.content,
+        original: originalContent,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
       };
       const noteRef = await addDoc(notesRef, data);
-
+      setPolishing(false);
       setCurrentNote({ ...data, id: noteRef.id });
     } catch (error) {
       console.log("Error creating note", error);
+      setPolishing(false);
     }
   };
 
@@ -176,6 +192,7 @@ function VoiceRecorder() {
         <p className="font-semibold text-2xl">{formatTimer(timer)}</p>
       )}
       {!transcribing &&
+        !polishing &&
         (!recording ? (
           <button
             onClick={handleRecordAudio}
@@ -193,7 +210,7 @@ function VoiceRecorder() {
           </button>
         ))}
 
-      {transcribing && (
+      {(transcribing || polishing) && (
         <div>
           <div
             className="animate-spin my-4 inline-block w-12 h-12 border-4 border-primary border-t-transparent rounded-full"
@@ -201,7 +218,11 @@ function VoiceRecorder() {
           >
             <span className="sr-only">Loading...</span>
           </div>
-          <p className="font-semibold">Transcribing your recording...</p>
+          <p className="font-semibold">
+            {transcribing
+              ? "Transcribing your recording..."
+              : "Polishing your recording..."}
+          </p>
         </div>
       )}
 
