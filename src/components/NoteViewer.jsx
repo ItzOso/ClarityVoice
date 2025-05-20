@@ -1,11 +1,11 @@
-import { FaRegTrashAlt, FaSave } from "react-icons/fa";
+import { FaRegCopy, FaRegTrashAlt, FaSave } from "react-icons/fa";
 import { FaWandMagicSparkles } from "react-icons/fa6";
-import { PiExportBold } from "react-icons/pi";
 import { useNoteViewer } from "../contexts/NoteViewerProvider";
 import { deleteDoc, doc, serverTimestamp, updateDoc } from "firebase/firestore";
 import { db } from "../firebase/firebaseConfig";
 import { useEffect, useRef, useState } from "react";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
+import { IoMdCheckmark } from "react-icons/io";
 
 function NoteViewer() {
   const { currentNote, setCurrentNote } = useNoteViewer();
@@ -121,6 +121,17 @@ function NoteViewer() {
     setIsSaving(false);
   };
 
+  const handleCopy = () => {
+    const noteToCopy = isShowingCurrent
+      ? currentNote?.content
+      : currentNote?.original;
+    navigator.clipboard.writeText(noteToCopy);
+    setShowCopySuccess(true);
+    setTimeout(() => {
+      setShowCopySuccess(false);
+    }, 2000);
+  };
+
   return (
     <div
       onClick={handleCloseModal}
@@ -182,10 +193,11 @@ function NoteViewer() {
               <FaRegTrashAlt />
             </button>
             <button
-              aria-label="export note"
+              onClick={handleCopy}
+              aria-label="copy note"
               className="h-10 w-10 flex justify-center items-center border border-gray-200 rounded-lg hover:bg-gray-100 cursor-pointer"
             >
-              <PiExportBold />
+              {showCopySuccess ? <IoMdCheckmark /> : <FaRegCopy />}
             </button>
             <button className="btn-secondary btn-icon">
               <FaWandMagicSparkles />
