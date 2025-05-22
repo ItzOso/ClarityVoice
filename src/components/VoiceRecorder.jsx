@@ -169,6 +169,7 @@ function VoiceRecorder() {
         uid: currentUser.uid,
         title: noteData.title,
         content: noteData.content,
+        polished: noteData.content,
         original: originalContent,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),

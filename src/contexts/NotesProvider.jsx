@@ -8,6 +8,7 @@ import {
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { db } from "../firebase/firebaseConfig";
 import { useAuth } from "./AuthProvider";
+import { useNoteViewer } from "./NoteViewerProvider";
 
 const NotesContext = createContext();
 

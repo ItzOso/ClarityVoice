@@ -1,11 +1,13 @@
-import { FaRegCopy, FaRegTrashAlt, FaSave } from "react-icons/fa";
+import { FaEnvelope, FaRegCopy, FaRegTrashAlt, FaSave } from "react-icons/fa";
 import { FaWandMagicSparkles } from "react-icons/fa6";
 import { useNoteViewer } from "../contexts/NoteViewerProvider";
 import { deleteDoc, doc, serverTimestamp, updateDoc } from "firebase/firestore";
-import { db } from "../firebase/firebaseConfig";
+import { db, functions } from "../firebase/firebaseConfig";
 import { useEffect, useRef, useState } from "react";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { IoMdCheckmark } from "react-icons/io";
+import SmartStructuresModal from "./SmartStructuresModal";
+import { httpsCallable } from "firebase/functions";
 
 function NoteViewer() {
   const { currentNote, setCurrentNote } = useNoteViewer();
@@ -25,6 +27,9 @@ function NoteViewer() {
   const [isDirty, setIsDirty] = useState(false);
 
   const [showCopySuccess, setShowCopySuccess] = useState(false);
+
+  const [smartStructureOpen, setSmartStructureOpen] = useState(false);
+  const [isStructuring, setIsStructuring] = useState(false);
 
   useEffect(() => {
     const title = currentNote.title || ""; // Default to empty string if undefined
@@ -132,6 +137,59 @@ function NoteViewer() {
     }, 2000);
   };
 
+  const handleApplyStructure = async (option) => {
+    setSmartStructureOpen(false);
+    setIsStructuring(true);
+    try {
+      // structuring logic here
+      const smartStructure = httpsCallable(functions, "smartStructure");
+      const response = await smartStructure({
+        content: currentNote.content || currentNote.original,
+        chosenOption: option,
+      });
+
+      const structuredNote = response.data;
+      const noteRef = doc(db, "notes", currentNote.id);
+
+      await updateDoc(noteRef, {
+        content: structuredNote,
+        updatedAt: serverTimestamp(),
+      });
+
+      setCurrentNote((prev) => ({
+        ...prev,
+        content: structuredNote,
+      }));
+
+      setIsStructuring(false);
+    } catch (error) {
+      console.log("Error smart structuring content:", error);
+      setIsStructuring(false);
+    }
+  };
+
+  const handleRevertToPolished = async () => {
+    try {
+      if (currentNote.content.trim() === currentNote.polished.trim()) {
+        return;
+      }
+
+      const noteRef = doc(db, "notes", currentNote.id);
+
+      await updateDoc(noteRef, {
+        content: currentNote.polished,
+        updatedAt: serverTimestamp(),
+      });
+
+      setCurrentNote((prev) => ({
+        ...prev,
+        content: currentNote.polished,
+      }));
+    } catch (error) {
+      console.log("Error reverting to polished:", error);
+    }
+  };
+
   return (
     <div
       onClick={handleCloseModal}
@@ -143,7 +201,7 @@ function NoteViewer() {
         onClick={(e) => {
           e.stopPropagation();
         }}
-        className="fixed w-full max-w-2xl left-1/2 top-1/2 -translate-y-1/2 -translate-x-1/2 rounded-lg border border-gray-200 bg-white p-6 space-y-4"
+        className="w-full max-w-2xl rounded-lg border border-gray-200 bg-white p-6 space-y-4"
       >
         <div>
           <input
@@ -154,53 +212,88 @@ function NoteViewer() {
             className="w-full text-2xl font-bold outline-none"
           />
         </div>
-        <div>
+        <div className="flex justify-between items-center">
+          <div>
+            <button
+              onClick={() => setIsShowingCurrent(true)}
+              className={`${
+                isShowingCurrent ? "btn-primary" : "btn-secondary"
+              } mr-2`}
+            >
+              Current
+            </button>
+            <button
+              onClick={() => setIsShowingCurrent(false)}
+              className={`${
+                isShowingCurrent ? "btn-secondary" : "btn-primary"
+              }`}
+            >
+              Original
+            </button>
+          </div>
           <button
-            onClick={() => setIsShowingCurrent(true)}
-            className={`${
-              isShowingCurrent ? "btn-primary" : "btn-secondary"
-            } mr-2`}
+            title="Revert back to the original polished transcription"
+            onClick={handleRevertToPolished}
+            className="btn-secondary"
           >
-            Current
-          </button>
-          <button
-            onClick={() => setIsShowingCurrent(false)}
-            className={`${isShowingCurrent ? "btn-secondary" : "btn-primary"}`}
-          >
-            Original
+            Revert to Original Polished
           </button>
         </div>
         <div>
-          <textarea
-            name=""
-            id=""
-            value={
-              isShowingCurrent ? currentNote?.content : currentNote?.original
-            }
-            onChange={handleContentChange}
-            disabled={!isShowingCurrent}
-            className={`resize-none w-full input h-[320px] !px-4 !py-3 disabled:bg-gray-100`}
-          ></textarea>
+          {isStructuring ? (
+            <div className="flex items-center justify-center w-full input h-[350px]">
+              <div
+                className="animate-spin inline-block w-10 h-10 border-4 border-primary border-t-transparent rounded-full"
+                role="status"
+              >
+                <span className="sr-only">Loading...</span>
+              </div>
+            </div>
+          ) : (
+            <textarea
+              name=""
+              id=""
+              value={
+                isShowingCurrent ? currentNote?.content : currentNote?.original
+              }
+              onChange={handleContentChange}
+              disabled={!isShowingCurrent}
+              className={`resize-none w-full input h-[350px] !px-4 !py-3 disabled:bg-gray-100`}
+            ></textarea>
+          )}
         </div>
-        <div className="flex justify-between items-center mb-0">
-          <div className="flex gap-2">
+        <div className="flex justify-between items-center mb-0 flex-col gap-2  sm:flex-row sm:gap-0">
+          <div className="flex gap-2 flex-col justify-center sm:flex-row">
+            <div className="flex gap-2 justify-center">
+              <button
+                title="delete note"
+                onClick={() => setDeleteModal(true)}
+                ref={deleteModalToggleRef}
+                aria-label="delete note"
+                className="h-10 w-10 flex justify-center items-center border border-gray-200 rounded-lg hover:bg-gray-100 cursor-pointer"
+              >
+                <FaRegTrashAlt />
+              </button>
+              <button
+                title="copy to clipboard"
+                onClick={handleCopy}
+                aria-label="copy note"
+                className="h-10 w-10 flex justify-center items-center border border-gray-200 rounded-lg hover:bg-gray-100 cursor-pointer"
+              >
+                {showCopySuccess ? <IoMdCheckmark /> : <FaRegCopy />}
+              </button>
+            </div>
             <button
-              onClick={() => setDeleteModal(true)}
-              ref={deleteModalToggleRef}
-              aria-label="delete note"
-              className="h-10 w-10 flex justify-center items-center border border-gray-200 rounded-lg hover:bg-gray-100 cursor-pointer"
+              title="smart structure note"
+              disabled={isStructuring}
+              onClick={() => setSmartStructureOpen(true)}
+              className="btn-secondary btn-icon"
             >
-              <FaRegTrashAlt />
-            </button>
-            <button
-              onClick={handleCopy}
-              aria-label="copy note"
-              className="h-10 w-10 flex justify-center items-center border border-gray-200 rounded-lg hover:bg-gray-100 cursor-pointer"
-            >
-              {showCopySuccess ? <IoMdCheckmark /> : <FaRegCopy />}
-            </button>
-            <button className="btn-secondary btn-icon">
-              <FaWandMagicSparkles />
+              {isStructuring ? (
+                <AiOutlineLoading3Quarters className="animate-spin" />
+              ) : (
+                <FaWandMagicSparkles />
+              )}
               Smart Structure
             </button>
           </div>
@@ -239,6 +332,13 @@ function NoteViewer() {
               </button>
             </div>
           </div>
+        )}
+
+        {smartStructureOpen && (
+          <SmartStructuresModal
+            setSmartStructureOpen={setSmartStructureOpen}
+            handleApplyStructure={handleApplyStructure}
+          />
         )}
       </div>
     </div>
