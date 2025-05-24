@@ -7,6 +7,8 @@ import Navbar from "./components/Navbar";
 import PrivateRoute from "./components/PrivateRoute";
 import HomePage from "./pages/HomePage";
 import SigninPage from "./pages/SigninPage";
+import { useAuth } from "./contexts/AuthProvider";
+import { useNoteViewer } from "./contexts/NoteViewerProvider";
 
 function App() {
   const { currentUser } = useAuth();
