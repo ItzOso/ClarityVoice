@@ -9,6 +9,13 @@ import HomePage from "./pages/HomePage";
 import SigninPage from "./pages/SigninPage";
 
 function App() {
+  const { currentUser } = useAuth();
+  const { setCurrentNote } = useNoteViewer();
+  useEffect(() => {
+    if (!currentUser) {
+      setCurrentNote(null);
+    }
+  }, [currentUser, setCurrentNote]);
   return (
     <div className="">
       <BrowserRouter>

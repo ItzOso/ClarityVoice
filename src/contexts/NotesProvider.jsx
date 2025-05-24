@@ -22,22 +22,26 @@ export const NotesProvider = ({ children }) => {
   const { currentUser } = useAuth();
 
   useEffect(() => {
-    const q = query(
-      collection(db, "notes"),
-      where("uid", "==", currentUser.uid),
-      orderBy("updatedAt", "desc")
-    );
+    if (currentUser && currentUser.uid) {
+      const q = query(
+        collection(db, "notes"),
+        where("uid", "==", currentUser.uid),
+        orderBy("updatedAt", "desc")
+      );
 
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      let newNotes = [];
-      snapshot.forEach((doc) => {
-        newNotes.push({ ...doc.data(), id: doc.id });
+      const unsubscribe = onSnapshot(q, (snapshot) => {
+        let newNotes = [];
+        snapshot.forEach((doc) => {
+          newNotes.push({ ...doc.data(), id: doc.id });
+        });
+        setNotes(newNotes);
       });
-      setNotes(newNotes);
-    });
 
-    return unsubscribe;
-  }, []);
+      return unsubscribe;
+    } else {
+      setNotes([]);
+    }
+  }, [currentUser]);
 
   const value = {
     notes,
