@@ -7,10 +7,13 @@ import { PiSignInBold, PiSignOutBold } from "react-icons/pi";
 function Navbar() {
   const { currentUser, signout } = useAuth();
   return (
-    <div className="h-[64px] px-12 flex justify-between items-center border-b border-gray-200">
-      <Link to="/" className="flex justify-center items-center gap-2">
-        <FaMicrophone className="text-primary text-2xl" />
-        <h2 className="text-2xl font-semibold text-center">ClarityVoice</h2>
+    <div className="h-[64px] px-6  sm:px-12 lg:px-28 flex justify-between items-center border-b border-gray-200">
+      <Link
+        to="/"
+        className="flex justify-center items-center gap-2 text-xl sm:text-2xl"
+      >
+        <FaMicrophone className="text-primary " />
+        <h2 className=" font-semibold text-center">ClarityVoice</h2>
       </Link>
       <div className="flex gap-2">
         {currentUser ? (

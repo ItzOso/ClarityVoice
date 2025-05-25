@@ -166,6 +166,21 @@ Rewrite the *entire informational content* of this text in a casual, friendly, a
 Use simple, everyday language, and ensure sentences are short, easy to read, and flow naturally.
 The goal is a warm, approachable, and easily digestible tone. The original tone should be intentionally transformed to be more relaxed and accessible.
 Text: ${content}`,
+      blog_post_draft: `You are an AI assistant. The user provides their current note text below. This text might be an initial polished thought, manually edited, or the result of a previous structuring attempt.
+Your task is to transform this text into a draft for a blog post.
+Suggest a compelling title for the blog post.
+Create an engaging introduction to grab the reader's attention.
+Structure the main content with clear paragraphs, and use subheadings if the content warrants it for better readability.
+Provide a concluding thought or call to action if appropriate.
+Aim for a readable and engaging style suitable for a blog, while trying to maintain the user's inherent style and tone from the input text.
+Text: ${content}`,
+      action_items: `You are an AI assistant. The user provides their current note text below. This text might be an initial polished thought, manually edited, or the result of a previous structuring attempt (often from a meeting or lecture).
+Your specific task is to scan this text thoroughly and extract only the clear, actionable tasks, to-do items, or explicit action points assigned to someone or implied as needing to be done.
+Present these as a concise bullet point list. Each bullet point should represent a distinct action.
+Phrase each action item clearly and directly, starting with an action verb if possible (e.g., "Send email to...", "Research options for...", "Finalize report on...").
+If no specific action items are found, please indicate that clearly (e.g., "No specific action items found.").
+Do not include general discussion points unless they are explicitly framed as tasks.
+Text: ${content}`,
     };
 
     const response = await client.responses.create({

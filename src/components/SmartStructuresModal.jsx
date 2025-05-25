@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import {
+  FaBlog,
   FaCompressArrowsAlt,
   FaEnvelope,
   FaListUl,
   FaSmile,
+  FaTasks,
   FaUserTie,
 } from "react-icons/fa";
 
@@ -52,6 +54,22 @@ function SmartStructuresModal({ setSmartStructureOpen, handleApplyStructure }) {
       description:
         "Converts your note into simpler, easy-to-understand sentences with a friendly style.",
       IconComponent: FaSmile, // Or PiChatCircleText
+    },
+    {
+      id: "structure_block_post_draft",
+      value: "blog_post_draft",
+      label: "Blog Post",
+      description:
+        "Outlines your note into a blog post structure, suggests title, intro, body, and conclusion to get you started quickly.",
+      IconComponent: FaBlog,
+    },
+    {
+      id: "structure_action_items",
+      value: "action_items",
+      label: "Action Items",
+      description:
+        "Scans your note for clear actionable to do items or tasks, presented in a concise list.",
+      IconComponent: FaTasks,
     },
   ];
 

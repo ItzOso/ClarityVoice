@@ -9,6 +9,7 @@ import HomePage from "./pages/HomePage";
 import SigninPage from "./pages/SigninPage";
 import { useAuth } from "./contexts/AuthProvider";
 import { useNoteViewer } from "./contexts/NoteViewerProvider";
+import LandingPage from "./pages/LandingPage";
 
 function App() {
   const { currentUser } = useAuth();
@@ -27,9 +28,15 @@ function App() {
           <Route
             path="/"
             element={
-              <PrivateRoute>
-                <HomePage />
-              </PrivateRoute>
+              currentUser ? (
+                <PrivateRoute>
+                  <HomePage />
+                </PrivateRoute>
+              ) : (
+                <PublicRoute>
+                  <LandingPage />
+                </PublicRoute>
+              )
             }
           />
           <Route
