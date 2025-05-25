@@ -7,7 +7,7 @@ import { useNotes } from "../contexts/NotesProvider";
 import { useNoteViewer } from "../contexts/NoteViewerProvider";
 
 function HomePage() {
-  const [showRecorder, setShowRecorder] = useState(false);
+  const [showRecorder, setShowRecorder] = useState(true);
 
   const { notes } = useNotes();
   const { currentNote } = useNoteViewer();

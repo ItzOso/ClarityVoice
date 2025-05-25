@@ -315,19 +315,22 @@ function NoteViewer() {
         {deleteModal && (
           <div
             ref={deleteModalRef}
-            className="fixed left-1/2 top-1/2 -translate-y-1/2 -translate-x-1/2 p-6 border border-gray-200 rounded-lg bg-white shadow-sm"
+            className="fixed left-1/2 top-1/2 -translate-y-1/2 -translate-x-1/2 p-6 w-[70%] sm:w-fit border border-gray-200 rounded-lg bg-white shadow-sm"
           >
             <p className="font-semibold mb-4 text-center">
               Are you sure you want to delete this note?
             </p>
-            <div className="flex items-center justify-center gap-2">
+            <div className="flex items-center justify-center gap-2 flex-col-reverse sm:flex-row">
               <button
                 onClick={() => setDeleteModal(false)}
-                className="btn-secondary"
+                className="btn-secondary w-full sm:w-fit"
               >
                 No, Cancel
               </button>
-              <button onClick={handleDeleteNote} className="btn-primary">
+              <button
+                onClick={handleDeleteNote}
+                className="btn-primary w-full sm:w-fit"
+              >
                 Yes, Delete
               </button>
             </div>

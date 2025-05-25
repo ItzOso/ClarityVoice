@@ -93,9 +93,9 @@ function SmartStructuresModal({ setSmartStructureOpen, handleApplyStructure }) {
   return (
     <div
       ref={modalRef}
-      className="fixed left-1/2 top-1/2 -translate-y-1/2 -translate-x-1/2 p-6 border w-[70%] max-w-lg border-gray-200 rounded-lg bg-white shadow-sm"
+      className="fixed left-1/2 top-1/2 -translate-y-1/2 -translate-x-1/2 p-6 border w-[90%] flex flex-col max-h-[90vh] max-w-lg border-gray-200 rounded-lg bg-white shadow-sm"
     >
-      <fieldset className="flex flex-col gap-2 h-96 overflow-auto">
+      <fieldset className="flex flex-col gap-2 h-96 overflow-y-auto">
         <legend className="text-lg mb-4">Choose Your Style:</legend>
         {structureOptionsData.map((option) => {
           return (
@@ -145,16 +145,16 @@ function SmartStructuresModal({ setSmartStructureOpen, handleApplyStructure }) {
           );
         })}
       </fieldset>
-      <div className="mt-4">
+      <div className="mt-4 flex gap-2 flex-col-reverse sm:flex-row">
         <button
           onClick={() => setSmartStructureOpen(false)}
-          className="btn-secondary mr-2"
+          className="btn-secondary w-full sm:w-fit"
         >
           Cancel
         </button>
         <button
           onClick={() => handleApplyStructure(selected)}
-          className="btn-primary"
+          className="btn-primary w-full sm:w-fit"
         >
           Apply
         </button>
