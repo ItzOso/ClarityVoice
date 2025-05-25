@@ -105,7 +105,7 @@ function SignupPage() {
   };
 
   return (
-    <div className="max-w-md mx-auto py-10">
+    <div className="max-w-md mx-auto py-10 px-4">
       <div className="flex justify-center items-center gap-2 mb-2">
         <FaMicrophone className="text-primary text-3xl" />
         <h2 className="text-3xl font-semibold text-center">ClarityVoice</h2>
