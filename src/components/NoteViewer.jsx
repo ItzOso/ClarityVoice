@@ -201,7 +201,7 @@ function NoteViewer() {
         onClick={(e) => {
           e.stopPropagation();
         }}
-        className="w-full max-w-2xl rounded-lg border border-gray-200 bg-white p-6 space-y-4"
+        className="w-full max-w-2xl rounded-lg border border-gray-200 bg-white p-6 space-y-4 max-h-[90vh] overflow-y-auto"
       >
         <div>
           <input
@@ -212,11 +212,11 @@ function NoteViewer() {
             className="w-full text-2xl font-bold outline-none"
           />
         </div>
-        <div className="flex justify-between items-center">
-          <div>
+        <div className="flex flex-col sm:flex-row justify-between items-center">
+          <div className="w-full flex sm:block sm:w-fit">
             <button
               onClick={() => setIsShowingCurrent(true)}
-              className={`${
+              className={`text-sm w-1/2 sm:w-fit ${
                 isShowingCurrent ? "btn-primary" : "btn-secondary"
               } mr-2`}
             >
@@ -224,7 +224,7 @@ function NoteViewer() {
             </button>
             <button
               onClick={() => setIsShowingCurrent(false)}
-              className={`${
+              className={`text-sm w-1/2 sm:w-fit ${
                 isShowingCurrent ? "btn-secondary" : "btn-primary"
               }`}
             >
@@ -234,7 +234,7 @@ function NoteViewer() {
           <button
             title="Revert back to the original polished transcription"
             onClick={handleRevertToPolished}
-            className="btn-secondary"
+            className="btn-secondary text-sm mt-2 sm:mt-0 w-full sm:w-fit"
           >
             Revert to Original Polished
           </button>
@@ -263,14 +263,14 @@ function NoteViewer() {
           )}
         </div>
         <div className="flex justify-between items-center mb-0 flex-col gap-2  sm:flex-row sm:gap-0">
-          <div className="flex gap-2 flex-col justify-center sm:flex-row">
+          <div className="flex gap-2 flex-col justify-center sm:flex-row w-full sm:w-fit">
             <div className="flex gap-2 justify-center">
               <button
                 title="delete note"
                 onClick={() => setDeleteModal(true)}
                 ref={deleteModalToggleRef}
                 aria-label="delete note"
-                className="h-10 w-10 flex justify-center items-center border border-gray-200 rounded-lg hover:bg-gray-100 cursor-pointer"
+                className="h-10 w-full sm:w-10 flex justify-center items-center border border-gray-200 rounded-lg hover:bg-gray-100 cursor-pointer"
               >
                 <FaRegTrashAlt />
               </button>
@@ -278,7 +278,7 @@ function NoteViewer() {
                 title="copy to clipboard"
                 onClick={handleCopy}
                 aria-label="copy note"
-                className="h-10 w-10 flex justify-center items-center border border-gray-200 rounded-lg hover:bg-gray-100 cursor-pointer"
+                className="h-10 w-full sm:w-10 flex justify-center items-center border border-gray-200 rounded-lg hover:bg-gray-100 cursor-pointer"
               >
                 {showCopySuccess ? <IoMdCheckmark /> : <FaRegCopy />}
               </button>
@@ -287,7 +287,7 @@ function NoteViewer() {
               title="smart structure note"
               disabled={isStructuring}
               onClick={() => setSmartStructureOpen(true)}
-              className="btn-secondary btn-icon"
+              className="btn-secondary btn-icon w-full sm:w-fit"
             >
               {isStructuring ? (
                 <AiOutlineLoading3Quarters className="animate-spin" />
@@ -300,7 +300,7 @@ function NoteViewer() {
           <button
             disabled={!isDirty || isSaving}
             onClick={handleSaveNote}
-            className="btn-primary btn-icon
+            className="btn-primary btn-icon w-full sm:w-fit
             "
           >
             {isSaving ? (
