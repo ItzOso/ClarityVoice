@@ -1,17 +1,33 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
-function NewFolderModal({ isOpen, setView, createFolder }) {
-  const [folderName, setFolderName] = useState("");
+function TextInputModal({
+  isOpen,
+  setView,
+  onSubmit,
+  inputLabel = "Name",
+  initialValue = "",
+  submitButtonText = "Submit",
+  inputPlaceholder = "",
+}) {
+  const [inputValue, setInputValue] = useState(initialValue);
 
-  const handleCreateFolder = async (e) => {
+  useEffect(() => {
+    if (isOpen) {
+      setInputValue(initialValue);
+    } else {
+      setInputValue("");
+    }
+  }, [isOpen, initialValue]);
+
+  const handleOnSubmit = async (e) => {
     e.preventDefault();
 
-    if (folderName.trim()) {
-      await createFolder(folderName.trim());
-      setFolderName("");
+    if (inputValue.trim()) {
+      await onSubmit(inputValue.trim());
+      setInputValue("");
       setView(false);
     } else {
-      console.log("Must input a folder name");
+      console.log("Must input a value");
     }
   };
 
@@ -20,10 +36,7 @@ function NewFolderModal({ isOpen, setView, createFolder }) {
   }
   return (
     <div
-      onClick={() => {
-        setFolderName("");
-        setView(false);
-      }}
+      onClick={() => setView(false)}
       className="fixed inset-0 bg-[rgba(0,0,0,0.5)] flex items-center justify-center z-50 p-4"
       role="dialog"
       aria-modal="true"
@@ -33,24 +46,23 @@ function NewFolderModal({ isOpen, setView, createFolder }) {
           e.stopPropagation();
         }}
         className="card space-y-4 w-full max-w-md"
-        onSubmit={handleCreateFolder}
+        onSubmit={handleOnSubmit}
       >
         <div className="flex flex-col gap-2">
-          <label htmlFor="newFolder">New Folder Name</label>
+          <label htmlFor="modelTextInput">{inputLabel}</label>
           <input
-            value={folderName}
-            onChange={(e) => setFolderName(e.target.value)}
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
             type="text"
-            id="newFolder"
+            id="modelTextInput"
             className="input"
-            placeholder="Enter a folder name"
+            placeholder={inputPlaceholder}
           />
         </div>
         <div className="flex gap-2 justify-center flex-col-reverse sm:flex-row">
           <button
             type="button"
             onClick={() => {
-              setFolderName("");
               setView(false);
             }}
             className="btn-secondary"
@@ -58,11 +70,11 @@ function NewFolderModal({ isOpen, setView, createFolder }) {
             Cancel
           </button>
           <button
-            disabled={!folderName.trim()}
+            disabled={!inputValue.trim()}
             type="submit"
             className="btn-primary"
           >
-            Create Folder
+            {submitButtonText}
           </button>
         </div>
       </form>
@@ -70,4 +82,4 @@ function NewFolderModal({ isOpen, setView, createFolder }) {
   );
 }
 
-export default NewFolderModal;
+export default TextInputModal;

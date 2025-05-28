@@ -12,12 +12,14 @@ import {
 } from "firebase/firestore";
 import { db } from "../../firebase/firebaseConfig";
 import { useAuth } from "../../contexts/AuthProvider";
+import TextInputModal from "../TextInputModal";
 
 function FolderItem({ folder, setFolders, selectedFolder, setSelectedFolder }) {
   const [showMenu, setShowMenu] = useState(false);
   const menuRef = useRef(null);
   const openMenuButtonRef = useRef(null);
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
+  const [isRenameModalOpen, setIsRenameModalOpen] = useState(false);
 
   const { currentUser } = useAuth();
 
@@ -79,6 +81,26 @@ function FolderItem({ folder, setFolders, selectedFolder, setSelectedFolder }) {
     }
   };
 
+  const handleRenameFolder = async (newName) => {
+    try {
+      const folderRef = doc(db, "folders", folder.id);
+
+      await updateDoc(folderRef, {
+        name: newName,
+      });
+
+      setFolders((prev) =>
+        prev.map((prevFolder) =>
+          prevFolder.id === folder.id
+            ? { ...prevFolder, name: newName }
+            : prevFolder
+        )
+      );
+    } catch (error) {
+      Console.log("Error renaming folder:", error);
+    }
+  };
+
   return (
     <div
       onClick={() => setSelectedFolder(folder)}
@@ -113,9 +135,18 @@ function FolderItem({ folder, setFolders, selectedFolder, setSelectedFolder }) {
           <button
             onClick={(e) => {
               e.stopPropagation();
+              setIsRenameModalOpen(true);
+            }}
+            className="btn-secondary !py-1 text-sm w-full"
+          >
+            Rename
+          </button>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
               setShowConfirmDelete(true);
             }}
-            className="btn-secondary !py-1 text-sm w-full text-start"
+            className="btn-secondary !py-1 text-sm w-full"
           >
             Delete
           </button>
@@ -131,6 +162,15 @@ function FolderItem({ folder, setFolders, selectedFolder, setSelectedFolder }) {
           setView={setShowConfirmDelete}
         />
       )}
+      <TextInputModal
+        isOpen={isRenameModalOpen}
+        setView={setIsRenameModalOpen}
+        onSubmit={handleRenameFolder}
+        inputLabel="Update Folder Name"
+        submitButtonText="Rename Folder"
+        inputPlaceholder="Enter a folder name"
+        initialValue={folder.name}
+      />
     </div>
   );
 }

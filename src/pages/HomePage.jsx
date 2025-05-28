@@ -14,7 +14,6 @@ import NoteViewer from "../components/NoteViewer";
 import { useNotes } from "../contexts/NotesProvider";
 import { useNoteViewer } from "../contexts/NoteViewerProvider";
 import FolderNav from "../components/folders/FolderNav";
-import NewFolderModal from "../components/folders/NewFolderModal";
 import {
   addDoc,
   collection,

@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { FaFolder, FaFolderPlus, FaHome } from "react-icons/fa";
 import AddFolderButton from "./AddFolderButton";
-import NewFolderModal from "./NewFolderModal";
 import FolderItem from "./FolderItem";
+import TextInputModal from "../TextInputModal";
 
 function FolderNav({
   createFolder,
@@ -17,7 +17,7 @@ function FolderNav({
       <button
         onClick={() => setSelectedFolder(null)}
         className={`btn-secondary btn-icon ${
-          !selectedFolder && "bg-gray-100 !cusror-default"
+          !selectedFolder && "bg-gray-100 hover:!bg-gray-200 !cusror-default"
         }`}
       >
         <FaHome />
@@ -35,10 +35,13 @@ function FolderNav({
       ))}
 
       <AddFolderButton setIsNewFolderModalOpen={setIsNewFolderModalOpen} />
-      <NewFolderModal
+      <TextInputModal
         isOpen={isNewFolderModalOpen}
         setView={setIsNewFolderModalOpen}
-        createFolder={createFolder}
+        onSubmit={createFolder}
+        inputLabel="New Folder Name"
+        submitButtonText="Create Folder"
+        inputPlaceholder="Enter a folder name"
       />
     </div>
   );
