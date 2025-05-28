@@ -122,7 +122,11 @@ function FolderItem({ folder, setFolders, selectedFolder, setSelectedFolder }) {
           e.stopPropagation();
           setShowMenu((prevShowMenu) => !prevShowMenu);
         }}
-        className={`text-sm opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity cursor-pointer`}
+        className={`text-sm ${
+          selectedFolder?.id === folder.id
+            ? "opacity-100" // Visible if selected
+            : "opacity-0 pointer-events-none md:group-hover:opacity-100 md:focus:opacity-100" // Hidden and non-interactive on mobile if not selected, hover/focus on desktop
+        } transition-opacity cursor-pointer`}
       >
         <FaEllipsisV />
       </button>
