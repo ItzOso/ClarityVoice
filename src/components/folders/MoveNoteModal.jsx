@@ -76,7 +76,7 @@ function MoveNoteModal({ note, isOpen, setView }) {
       >
         <p>Move Note To:</p>
         <div className="space-y-1 h-full overflow-y-auto">
-          {isFetchingFolders && (
+          {isFetchingFolders ? (
             <div className="absolute left-1/2 top-1/2 -translate-y-1/2 -translate-x-1/2">
               <div
                 className="animate-spin inline-block w-8 h-8 border-3 border-primary border-t-transparent rounded-full"
@@ -85,24 +85,25 @@ function MoveNoteModal({ note, isOpen, setView }) {
                 <span className="sr-only">Loading...</span>
               </div>
             </div>
+          ) : (
+            folders.map((folder) => (
+              <div
+                key={folder.id}
+                onClick={() => handleClickSelection(folder.id)}
+                className={`btn-secondary btn-icon !justify-start text-sm sm:text-base ${
+                  selectedFolder === folder.id && "bg-gray-100"
+                }`}
+              >
+                <FaFolder />
+                <p className="line-clamp-1">{folder.name}</p>
+              </div>
+            ))
           )}
           {folders.length === 0 && !isFetchingFolders && (
             <p className="text-gray-500 absolute left-1/2 top-1/2 -translate-y-1/2 -translate-x-1/2">
               You currenly have no folders.
             </p>
           )}
-          {folders.map((folder) => (
-            <div
-              key={folder.id}
-              onClick={() => handleClickSelection(folder.id)}
-              className={`btn-secondary btn-icon !justify-start text-sm sm:text-base ${
-                selectedFolder === folder.id && "bg-gray-100"
-              }`}
-            >
-              <FaFolder />
-              <p className="line-clamp-1">{folder.name}</p>
-            </div>
-          ))}
         </div>
         <div className="mt-1 flex gap-2 flex-col-reverse sm:flex-row">
           <button

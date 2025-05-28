@@ -334,6 +334,7 @@ function NoteViewer() {
 
         {deleteModal && (
           <ConfirmDeleteModal
+            deleteMessage={"Are you sure you want to delete this note?"}
             setView={setDeleteModal}
             handleDeleteFunction={handleDeleteNote}
           />

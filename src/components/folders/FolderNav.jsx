@@ -7,6 +7,7 @@ import FolderItem from "./FolderItem";
 function FolderNav({
   createFolder,
   folders,
+  setFolders,
   selectedFolder,
   setSelectedFolder,
 }) {
@@ -27,6 +28,7 @@ function FolderNav({
         <FolderItem
           key={folder.id}
           folder={folder}
+          setFolders={setFolders}
           selectedFolder={selectedFolder}
           setSelectedFolder={setSelectedFolder}
         />

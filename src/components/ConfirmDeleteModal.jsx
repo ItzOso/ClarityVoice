@@ -1,9 +1,15 @@
 import React from "react";
 
-function ConfirmDeleteModal({ setView, handleDeleteFunction }) {
+function ConfirmDeleteModal({
+  deleteMessage,
+  secondaryMessage,
+  setView,
+  handleDeleteFunction,
+}) {
   return (
     <div
-      onClick={() => {
+      onClick={(e) => {
+        e.stopPropagation();
         setView(false);
       }} // This will close the modal
       className="fixed inset-0 bg-[rgba(0,0,0,0.5)] flex items-center justify-center z-50 p-4"
@@ -12,11 +18,16 @@ function ConfirmDeleteModal({ setView, handleDeleteFunction }) {
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="p-6 w-[80%] sm:w-fit border border-gray-200 rounded-lg bg-white shadow-sm"
+        className="p-6 w-[80%] sm:max-w-md sm:w-fit border border-gray-200 rounded-lg bg-white shadow-sm"
       >
-        <p className="font-semibold mb-4 text-center">
-          Are you sure you want to delete this note?
-        </p>
+        <div className="mb-4">
+          <p className="font-semibold text-center">{deleteMessage}</p>
+          {secondaryMessage && (
+            <p className="text-gray-500 text-sm text-center">
+              {secondaryMessage}
+            </p>
+          )}
+        </div>
         <div className="flex items-center justify-center gap-2 flex-col-reverse sm:flex-row">
           <button
             onClick={() => setView(false)}

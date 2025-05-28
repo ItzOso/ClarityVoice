@@ -93,6 +93,7 @@ function HomePage() {
         <FolderNav
           createFolder={handleCreateFolder}
           folders={folders}
+          setFolders={setFolders}
           selectedFolder={selectedFolder}
           setSelectedFolder={setSelectedFolder}
         />
