@@ -125,7 +125,7 @@ function FolderItem({ folder, setFolders, selectedFolder, setSelectedFolder }) {
         className={`text-sm ${
           selectedFolder?.id === folder.id
             ? "opacity-100" // Visible if selected
-            : "opacity-0 pointer-events-none md:group-hover:opacity-100 md:focus:opacity-100" // Hidden and non-interactive on mobile if not selected, hover/focus on desktop
+            : "opacity-0 pointer-events-none md:pointer-events-auto md:group-hover:opacity-100 md:focus:opacity-100" // Hidden and non-interactive on mobile if not selected, hover/focus on desktop
         } transition-opacity cursor-pointer`}
       >
         <FaEllipsisV />
