@@ -1,4 +1,12 @@
-import { FaEnvelope, FaRegCopy, FaRegTrashAlt, FaSave } from "react-icons/fa";
+import {
+  FaArrowRight,
+  FaEnvelope,
+  FaFolder,
+  FaFolderOpen,
+  FaRegCopy,
+  FaRegTrashAlt,
+  FaSave,
+} from "react-icons/fa";
 import { FaWandMagicSparkles } from "react-icons/fa6";
 import { useNoteViewer } from "../contexts/NoteViewerProvider";
 import { deleteDoc, doc, serverTimestamp, updateDoc } from "firebase/firestore";
@@ -8,6 +16,8 @@ import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { IoMdCheckmark } from "react-icons/io";
 import SmartStructuresModal from "./SmartStructuresModal";
 import { httpsCallable } from "firebase/functions";
+import MoveNoteModal from "./folders/MoveNoteModal";
+import ConfirmDeleteModal from "./ConfirmDeleteModal";
 
 function NoteViewer() {
   const { currentNote, setCurrentNote } = useNoteViewer();
@@ -30,6 +40,8 @@ function NoteViewer() {
 
   const [smartStructureOpen, setSmartStructureOpen] = useState(false);
   const [isStructuring, setIsStructuring] = useState(false);
+
+  const [moveNoteIsOpen, setMoveNoteIsOpen] = useState(false);
 
   useEffect(() => {
     const title = currentNote.title || ""; // Default to empty string if undefined
@@ -203,7 +215,7 @@ function NoteViewer() {
         }}
         className="w-full max-w-2xl rounded-lg border border-gray-200 bg-white p-6 space-y-4 max-h-[90vh] overflow-y-auto"
       >
-        <div>
+        <div className="flex items-center gap-2">
           <input
             type="text"
             placeholder="Untitled Note"
@@ -211,6 +223,14 @@ function NoteViewer() {
             onChange={handleTitleChange}
             className="w-full text-2xl font-bold outline-none"
           />
+          <div>
+            <button
+              onClick={() => setMoveNoteIsOpen(true)}
+              className="btn-primary"
+            >
+              <FaFolder />
+            </button>
+          </div>
         </div>
         <div className="flex flex-col sm:flex-row justify-between items-center">
           <div className="w-full flex sm:block sm:w-fit">
@@ -313,36 +333,23 @@ function NoteViewer() {
         </div>
 
         {deleteModal && (
-          <div
-            ref={deleteModalRef}
-            className="fixed left-1/2 top-1/2 -translate-y-1/2 -translate-x-1/2 p-6 w-[70%] sm:w-fit border border-gray-200 rounded-lg bg-white shadow-sm"
-          >
-            <p className="font-semibold mb-4 text-center">
-              Are you sure you want to delete this note?
-            </p>
-            <div className="flex items-center justify-center gap-2 flex-col-reverse sm:flex-row">
-              <button
-                onClick={() => setDeleteModal(false)}
-                className="btn-secondary w-full sm:w-fit"
-              >
-                No, Cancel
-              </button>
-              <button
-                onClick={handleDeleteNote}
-                className="btn-primary w-full sm:w-fit"
-              >
-                Yes, Delete
-              </button>
-            </div>
-          </div>
+          <ConfirmDeleteModal
+            setView={setDeleteModal}
+            handleDeleteFunction={handleDeleteNote}
+          />
         )}
 
         {smartStructureOpen && (
           <SmartStructuresModal
-            setSmartStructureOpen={setSmartStructureOpen}
+            setView={setSmartStructureOpen}
             handleApplyStructure={handleApplyStructure}
           />
         )}
+        <MoveNoteModal
+          note={currentNote}
+          isOpen={moveNoteIsOpen}
+          setView={setMoveNoteIsOpen}
+        />
       </div>
     </div>
   );
