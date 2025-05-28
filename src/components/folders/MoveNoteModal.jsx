@@ -63,7 +63,6 @@ function MoveNoteModal({ note, isOpen, setView }) {
   return (
     <div
       onClick={() => {
-        handleMoveNote();
         setView(false);
       }} // This will close the modal
       className="fixed inset-0 bg-[rgba(0,0,0,0.5)] flex items-center justify-center z-50 p-4"

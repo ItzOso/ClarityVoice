@@ -80,7 +80,10 @@ function SmartStructuresModal({ setView, handleApplyStructure }) {
       role="dialog"
       aria-modal="true"
     >
-      <div className="p-6 border w-[90%] flex flex-col max-h-[90vh] max-w-lg border-gray-200 rounded-lg bg-white shadow-sm">
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="p-6 border w-[90%] flex flex-col max-h-[90vh] max-w-lg border-gray-200 rounded-lg bg-white shadow-sm"
+      >
         <fieldset className="flex flex-col gap-2 h-96 overflow-y-auto">
           <legend className="text-lg mb-4">Choose Your Style:</legend>
           {structureOptionsData.map((option) => {
@@ -141,6 +144,7 @@ function SmartStructuresModal({ setView, handleApplyStructure }) {
             Cancel
           </button>
           <button
+            disabled={!selected}
             onClick={() => handleApplyStructure(selected)}
             className="btn-primary w-full sm:w-fit"
           >
