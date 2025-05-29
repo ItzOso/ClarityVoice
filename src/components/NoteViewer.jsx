@@ -3,6 +3,7 @@ import {
   FaEnvelope,
   FaFolder,
   FaFolderOpen,
+  FaMicrophone,
   FaRegCopy,
   FaRegTrashAlt,
   FaSave,
@@ -18,6 +19,7 @@ import SmartStructuresModal from "./SmartStructuresModal";
 import { httpsCallable } from "firebase/functions";
 import MoveNoteModal from "./folders/MoveNoteModal";
 import ConfirmDeleteModal from "./ConfirmDeleteModal";
+import AddToNote from "./AddToNote";
 
 function NoteViewer() {
   const { currentNote, setCurrentNote } = useNoteViewer();
@@ -270,16 +272,25 @@ function NoteViewer() {
               </div>
             </div>
           ) : (
-            <textarea
-              name=""
-              id=""
-              value={
-                isShowingCurrent ? currentNote?.content : currentNote?.original
-              }
-              onChange={handleContentChange}
-              disabled={!isShowingCurrent}
-              className={`resize-none w-full input h-[350px] !px-4 !py-3 disabled:bg-gray-100`}
-            ></textarea>
+            <div
+              className={`border border-gray-200 rounded-lg focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2 ${
+                !isShowingCurrent && "bg-gray-100"
+              }`}
+            >
+              <textarea
+                name=""
+                id=""
+                value={
+                  isShowingCurrent
+                    ? currentNote?.content
+                    : currentNote?.original
+                }
+                onChange={handleContentChange}
+                disabled={!isShowingCurrent}
+                className={`resize-none w-full  h-[350px] !px-4 !pt-3 outline-none rounded-lg`}
+              ></textarea>
+              {isShowingCurrent && <AddToNote note={currentNote} />}
+            </div>
           )}
         </div>
         <div className="flex justify-between items-center mb-0 flex-col gap-2  sm:flex-row sm:gap-0">

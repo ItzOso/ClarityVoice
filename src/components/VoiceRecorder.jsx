@@ -8,149 +8,16 @@ import {
   NoteViewerContext,
   useNoteViewer,
 } from "../contexts/NoteViewerProvider";
+import { useVoiceProccessing } from "../hooks/useVoiceProccessing";
 
 function VoiceRecorder() {
-  const [recording, setRecording] = useState(false);
-  const [transcribing, setTranscribing] = useState(false);
-  const [polishing, setPolishing] = useState(false);
-  const mediaRecorder = useRef(null);
-  const chunks = useRef([]);
-  const [audioUrl, setAudioUrl] = useState("");
-  const stream = useRef(null);
-
-  const [timer, setTimer] = useState(null);
-  const timerInterval = useRef(null);
+  const [isPolishing, setIsPolishing] = useState(false);
 
   const { currentUser } = useAuth();
   const { setCurrentNote } = useNoteViewer();
 
-  const startTimer = () => {
-    if (timerInterval.current) {
-      clearInterval(timerInterval.current);
-      timerInterval.current = null;
-    }
-    setTimer(120); // 2 minute
-    timerInterval.current = setInterval(() => {
-      setTimer((prevTimer) => {
-        if (prevTimer <= 1) {
-          clearInterval(timerInterval.current);
-          handleStopRecording();
-          return 0;
-        }
-        return prevTimer - 1;
-      });
-    }, 1000);
-  };
-
-  const formatTimer = (seconds) => {
-    const minutesLeft = Math.floor(seconds / 60);
-    const secondsLeft = Math.floor(seconds % 60)
-      .toString()
-      .padStart(2, "0");
-    return `${minutesLeft}:${secondsLeft}`;
-  };
-
-  const handleRecordAudio = async () => {
-    if (mediaRecorder.current && mediaRecorder.current.state === "recording") {
-      mediaRecorder.current.stop(); // Stop existing recording (will trigger onstop for its cleanup)
-    }
-    // If stream exists from a previous attempt that didn't clean up fully (e.g., error before onstop)
-    if (stream.current) {
-      stream.current.getTracks().forEach((track) => track.stop());
-      stream.current = null;
-    }
-    chunks.current = [];
-    URL.revokeObjectURL(audioUrl);
-    setAudioUrl("");
-    try {
-      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-        stream.current = await navigator.mediaDevices.getUserMedia({
-          audio: true,
-        });
-        mediaRecorder.current = new MediaRecorder(stream.current, {
-          mimeType: "audio/webm;codecs=opus",
-        });
-
-        mediaRecorder.current.ondataavailable = (event) => {
-          if (event.data.size > 0) {
-            chunks.current.push(event.data);
-          }
-        };
-
-        mediaRecorder.current.onstop = () => {
-          const audioBlob = new Blob(chunks.current, {
-            type: "audio/webm;codecs=opus",
-          });
-          setAudioUrl(URL.createObjectURL(audioBlob));
-          setRecording(false);
-
-          const transcribeAudio = httpsCallable(functions, "transcribeAudio");
-
-          const reader = new FileReader();
-          reader.onloadend = async () => {
-            try {
-              const audioBase64 = reader.result.split(",")[1]; // Extract base64 data
-              setTranscribing(true);
-              const response = await transcribeAudio({ audioBase64 });
-              setTranscribing(false);
-              createNote(response.data.text);
-            } catch (error) {
-              console.error("Error sending audio to backend:", error);
-              setTranscribing(false);
-            }
-          };
-          reader.readAsDataURL(audioBlob);
-
-          if (stream.current) {
-            stream.current.getTracks().forEach((track) => track.stop());
-            stream.current = null;
-          }
-        };
-
-        mediaRecorder.current.onerror = (event) => {
-          console.error("MediaRecorder error:", event.error);
-          setRecording(false);
-          if (stream.current) {
-            stream.current.getTracks().forEach((track) => track.stop());
-            stream.current = null;
-          }
-        };
-
-        mediaRecorder.current.start();
-        startTimer();
-        setRecording(true);
-      }
-    } catch (error) {
-      console.log("Error recording audio:", error);
-      setRecording(false);
-    }
-  };
-
-  const handleStopRecording = () => {
-    if (mediaRecorder.current && mediaRecorder.current.state === "recording") {
-      mediaRecorder.current.stop(); // This will trigger the 'onstop' event handler
-    } else if (recording) {
-      // fixes inconsistencies in UI
-      setRecording(false);
-    }
-  };
-
-  useEffect(() => {
-    return () => {
-      if (stream.current) {
-        stream.current.getTracks().forEach((track) => track.stop());
-      }
-      if (
-        mediaRecorder.current &&
-        mediaRecorder.current.state === "recording"
-      ) {
-        mediaRecorder.current.stop();
-      }
-    };
-  }, []);
-
-  const createNote = async (originalContent) => {
-    setPolishing(true);
+  const createNote = async (transcribedText) => {
+    setIsPolishing(true);
     try {
       const polishTranscription = httpsCallable(
         functions,
@@ -159,7 +26,7 @@ function VoiceRecorder() {
 
       // returns json with title, content
       const response = await polishTranscription({
-        transcription: originalContent,
+        transcription: transcribedText,
       });
 
       const noteData = response.data;
@@ -170,18 +37,26 @@ function VoiceRecorder() {
         title: noteData.title,
         content: noteData.content,
         polished: noteData.content,
-        original: originalContent,
+        original: transcribedText,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
       };
       const noteRef = await addDoc(notesRef, data);
-      setPolishing(false);
+      setIsPolishing(false);
       setCurrentNote({ ...data, id: noteRef.id });
     } catch (error) {
       console.log("Error creating note", error);
-      setPolishing(false);
+      setIsPolishing(false);
     }
   };
+
+  const {
+    startRecording,
+    stopRecording,
+    isRecording,
+    isTranscribing,
+    formattedTimer,
+  } = useVoiceProccessing({ onTranscriptionComplete: createNote });
 
   return (
     <div className="max-w-md border border-gray-200 rounded-lg p-6 text-center space-y-2 mx-auto">
@@ -189,29 +64,29 @@ function VoiceRecorder() {
       <p className="text-gray-500">
         Speak clearly for the best transcription results
       </p>
-      {recording && (
-        <p className="font-semibold text-2xl">{formatTimer(timer)}</p>
+      {isRecording && (
+        <p className="font-semibold text-2xl">{formattedTimer()}</p>
       )}
-      {!transcribing &&
-        !polishing &&
-        (!recording ? (
+      {!isTranscribing &&
+        !isPolishing &&
+        (!isRecording ? (
           <button
-            onClick={handleRecordAudio}
-            disabled={recording}
+            onClick={startRecording}
+            disabled={isRecording}
             className="text-4xl p-8 text-white bg-primary hover:opacity-90 rounded-full w-fit mx-auto cursor-pointer"
           >
             <FaMicrophone />
           </button>
         ) : (
           <button
-            onClick={handleStopRecording}
+            onClick={stopRecording}
             className="p-8 text-4xl text-white bg-primary hover:opacity-90 rounded-full w-fit animate-pulse mx-auto cursor-pointer"
           >
             <FaStop />
           </button>
         ))}
 
-      {(transcribing || polishing) && (
+      {(isTranscribing || isPolishing) && (
         <div>
           <div
             className="animate-spin my-4 inline-block w-12 h-12 border-4 border-primary border-t-transparent rounded-full"
@@ -220,7 +95,7 @@ function VoiceRecorder() {
             <span className="sr-only">Loading...</span>
           </div>
           <p className="font-semibold">
-            {transcribing
+            {isTranscribing
               ? "Transcribing your recording..."
               : "Polishing your recording..."}
           </p>
