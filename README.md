@@ -2,7 +2,7 @@
 
 ClarityVoice is an intelligent voice-first productivity app that transforms your spoken thoughts into polished, structured, and actionable text. Record voice notes effortlessly, and let AI automatically transcribe, refine the content while preserving your unique style, and then reformat it into various useful structures like summaries, emails, bullet points, and more.
 
-🔗 [Live App] https://clarityvoice-4a575.web.app/
+🔗 [Live App](https://clarityvoice-4a575.web.app/)
 ---
 
 ## 🚀 Features
