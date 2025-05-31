@@ -47,15 +47,6 @@ function NoteCard({ note }) {
     };
   }, [openMenu]); // Re-run this effect if openMenu changes
 
-  const handleDeleteNote = async () => {
-    try {
-      const noteRef = doc(db, "notes", note.id);
-      await deleteDoc(noteRef);
-    } catch (error) {
-      console.log("Error deleting note:", error);
-    }
-  };
-
   const handleOpenNote = () => {
     setCurrentNote(note);
   };

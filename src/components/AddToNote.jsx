@@ -6,6 +6,7 @@ import { db, functions } from "../firebase/firebaseConfig";
 import { useNoteViewer } from "../contexts/NoteViewerProvider";
 import { httpsCallable } from "firebase/functions";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
+import toast from "react-hot-toast";
 
 function AddToNote({ note }) {
   const [isPolishing, setIsPolishing] = useState(false);
@@ -44,9 +45,12 @@ function AddToNote({ note }) {
         content: `${note.content} \n\n ${newPolished}`,
         updatedAt: serverTimestamp(),
       });
-
+      toast.success("Successfully added to note");
       setIsAppending(false);
     } catch (error) {
+      toast.error(
+        "An error occured while appending new note. Please try again."
+      );
       console.log("Error adding on to note:", error);
     }
   };

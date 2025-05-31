@@ -26,6 +26,7 @@ import {
 import { db } from "../firebase/firebaseConfig";
 import { useAuth } from "../contexts/AuthProvider";
 import { fetchUserFolders } from "../firebase/folder";
+import toast from "react-hot-toast";
 
 function HomePage() {
   const [showRecorder, setShowRecorder] = useState(true);
@@ -44,6 +45,9 @@ function HomePage() {
         const results = await fetchUserFolders(currentUser.uid);
         setFolders(results);
       } catch (error) {
+        toast.error(
+          "An error occured while fetching folders. Try reloading page."
+        );
         console.log("Error fetching folders:", error);
       }
     };
@@ -72,6 +76,9 @@ function HomePage() {
       const folderRef = await addDoc(foldersRef, data);
       setFolders((prev) => [...prev, { ...data, id: folderRef.id }]);
     } catch (error) {
+      toast.error(
+        "An error occured while creating new folder. Please try again."
+      );
       console.log("Error creating new folder:", error);
     }
   };

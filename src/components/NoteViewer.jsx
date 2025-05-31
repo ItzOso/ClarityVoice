@@ -20,6 +20,7 @@ import { httpsCallable } from "firebase/functions";
 import MoveNoteModal from "./folders/MoveNoteModal";
 import ConfirmDeleteModal from "./ConfirmDeleteModal";
 import AddToNote from "./AddToNote";
+import toast from "react-hot-toast";
 
 function NoteViewer() {
   const { currentNote, setCurrentNote } = useNoteViewer();
@@ -115,6 +116,7 @@ function NoteViewer() {
       setDeleteModal(false);
       handleCloseModal();
     } catch (error) {
+      toast.error("An error occured while deleting note. Please try again.");
       console.log("Error deleting note:", error);
     }
   };
@@ -135,6 +137,7 @@ function NoteViewer() {
       setOriginalContent(currentNote.content);
       setOriginalTitle(currentNote.title);
     } catch (error) {
+      toast.error("An error occured while saving note. Please try again.");
       console.log("Error saving note:", error);
     }
     setIsSaving(false);
@@ -174,9 +177,10 @@ function NoteViewer() {
         ...prev,
         content: structuredNote,
       }));
-
+      toast.success("Successfully smart structured note.");
       setIsStructuring(false);
     } catch (error) {
+      toast.error("An error occured while structuring note. Please try again.");
       console.log("Error smart structuring content:", error);
       setIsStructuring(false);
     }
@@ -199,7 +203,11 @@ function NoteViewer() {
         ...prev,
         content: currentNote.polished,
       }));
+
+      toast.success("Reverted note to original polished version.");
     } catch (error) {
+      toast.error("An error occured while reverting note. Please try again.");
+
       console.log("Error reverting to polished:", error);
     }
   };

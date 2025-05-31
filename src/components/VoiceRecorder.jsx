@@ -9,6 +9,7 @@ import {
   useNoteViewer,
 } from "../contexts/NoteViewerProvider";
 import { useVoiceProccessing } from "../hooks/useVoiceProccessing";
+import toast from "react-hot-toast";
 
 function VoiceRecorder() {
   const [isPolishing, setIsPolishing] = useState(false);
@@ -46,6 +47,7 @@ function VoiceRecorder() {
       setCurrentNote({ ...data, id: noteRef.id });
     } catch (error) {
       console.log("Error creating note", error);
+      toast.error("An error occurred creating your note. Please try again.");
       setIsPolishing(false);
     }
   };

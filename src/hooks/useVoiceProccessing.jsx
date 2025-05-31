@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { functions } from "../firebase/firebaseConfig";
 import { httpsCallable } from "firebase/functions";
+import toast from "react-hot-toast";
 
 export function useVoiceProccessing({ onTranscriptionComplete }) {
   const [isRecording, setIsRecording] = useState(false);
@@ -61,6 +62,9 @@ export function useVoiceProccessing({ onTranscriptionComplete }) {
                 onTranscriptionComplete(response.data.text);
               }
             } catch (error) {
+              toast.error(
+                "An error occured while sending audio to backend. Please try again."
+              );
               console.error("Error sending audio to backend:", error);
               setIsTranscribing(false);
             }
@@ -74,6 +78,7 @@ export function useVoiceProccessing({ onTranscriptionComplete }) {
         };
 
         mediaRecorder.current.onerror = (event) => {
+          toast.error("An error occured while recording. Please try again.");
           console.error("MediaRecorder error:", event.error);
           setIsRecording(false);
           if (stream.current) {
@@ -87,6 +92,7 @@ export function useVoiceProccessing({ onTranscriptionComplete }) {
         setIsRecording(true);
       }
     } catch (error) {
+      toast.error("An error occured while recording. Please try again.");
       console.log("Error recording audio:", error);
       setIsRecording(false);
     }

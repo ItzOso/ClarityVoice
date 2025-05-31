@@ -10,6 +10,7 @@ import SigninPage from "./pages/SigninPage";
 import { useAuth } from "./contexts/AuthProvider";
 import { useNoteViewer } from "./contexts/NoteViewerProvider";
 import LandingPage from "./pages/LandingPage";
+import { Toaster } from "react-hot-toast";
 
 function App() {
   const { currentUser } = useAuth();
@@ -56,6 +57,7 @@ function App() {
             }
           />
         </Routes>
+        <Toaster />
       </BrowserRouter>
     </div>
   );
